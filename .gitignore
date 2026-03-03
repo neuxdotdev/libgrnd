@@ -87,3 +87,4 @@ _ttd_log_
 .history
 .ionide
 
+build/
