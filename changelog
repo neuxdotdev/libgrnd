@@ -78,3 +78,8 @@
 * [6fce595] 2026-03-03 | neuxdotdev | Merge branch 'master' of https://github.com/neuxdotdev/libgrnd
 * [f1c8aef] 2026-03-03 | CI Bot | Update changelog [2026-03-03 05:34:51]
 * [94013cf] 2026-03-03 | neuxdotdev | ci(build): add project build before release
+* [7513a60] 2026-03-03 | CI Bot | Update changelog [2026-03-03 07:22:58]
+* [3d63b2c] 2026-03-03 | neuxdotdev | chore: refactor api key to auth dir
+* [33f0262] 2026-03-03 | neuxdotdev | chore: move bcryp lib to crypto dir
+* [ac99cbd] 2026-03-03 | neuxdotdev | chore: add some lib adn renaming
+* [549b464] 2026-03-03 | neuxdotdev | Merge branch 'master' of https://github.com/neuxdotdev/libgrnd
