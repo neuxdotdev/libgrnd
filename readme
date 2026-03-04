@@ -1,3 +1,124 @@
-libgrnd
+LIBRGRN
+Security Library and Random Data Generator Documentation
 
-libgrnd is a modular typesrcipts library for random data generation and a security toolkit, inspired by <https://generate-random.org>. This library is designed to be modular, scalable, and maintainable, suitable for backend implementations, cryptography, and API integrations. It provides a comprehensive set of features for generating random data, managing cryptographic keys, and handling security-related tasks
+INTRODUCTION
+librgrn is a modular TypeScript library for Node.js designed specifically for random data generation and security toolkits. The library is inspired by generate-random.org and built for backend use, cryptography, and API integration. Its primary focus is providing comprehensive features for generating random data, managing cryptographic keys, and handling security-related tasks with strong entropy validation. The library is open source and prioritizes security and ease of use in server environments.
+
+KEY FEATURES
+
+1. Security Token Generator
+   Bearer Token: Generates random tokens in various formats (base64, hex, alphanumeric) and validates their entropy strength. Known in code as BearerGenerator.
+   JWT (JSON Web Token): Creates, signs, verifies, and decodes JWTs with support for HS (HMAC) and RS (RSA) algorithms. Includes claim validation and expiration times.
+   OAuth Token: Generates a complete set of OAuth tokens, including access tokens, refresh tokens, and ID tokens with scope and expiry options.
+   Webhook Secret: Generates webhook secrets with HMAC signature verification (supports SHA256, SHA384, SHA512, and SHA1).
+
+2. Authentication and Credentials
+   Password Generator: Creates strong passwords with character options (uppercase, lowercase, numbers, symbols) and pattern validation (prevents repeated or consecutive characters).
+   PIN Generator: Creates numeric PINs with security options such as preventing consecutive numbers, repeated numbers, or zeros.
+   API Key and Token: Generates API keys with optional prefixes, customizable formats, and the option to include a key secret.
+
+3. Cryptography Utilities
+   Supports operations related to encryption keys, hashes, salts, Laravel keys, and SSH keys.
+   Bcrypt integration for secure password hashing.
+   Entropy calculation to measure key or token strength.
+
+4. Validation and Metadata
+   Each generation includes metadata about the entropy strength (weak, medium, strong, very_strong).
+   Validation functions are available to check the strength of existing tokens, passwords, or secrets.
+   Option to export results in various formats such as JSON, TXT, CSV, or environment variable format (ENV) for easy configuration.
+
+5. Error Handling
+   A custom error system derived from LibrgrnError for easy debugging.
+   Error types include AuthError, TokenError, CryptoError, ValidationError, PinError, and PasswordError.
+
+SYSTEM REQUIREMENTS
+Node.js version 24 or higher.
+npm (Node Package Manager).
+TypeScript (recommended for development because the library is written in TypeScript).
+
+INSTALLATION
+To install this library via npm, run the following command in your project's terminal:
+npm install librgrn
+
+If you want to contribute or develop from source, clone the repository and run:
+git clone https://github.com/neuxdotdev/librgrn.git
+cd librgrn
+npm install
+npm run build
+
+HOW TO USE
+This library uses ES6 modules. Make sure your project supports the module type or use standard imports. Here are examples of how to use some of its key features.
+
+Example 1: Generating a Strong Password
+Import the function from the auth module.
+import { passwordGenerateOne, passwordGenerateStrong } from 'librgrn'
+const password = passwordGenerateOne({ length: 16, useSymbols: true })
+const strongPassword = passwordGenerateStrong()
+
+Example 2: Generating a Bearer Token
+Import from the token module.
+import { barerGeneratorGenerateToken } from 'librgrn'
+const token = barerGeneratorGenerateToken({ length: 32, format: 'base64url' })
+
+Example 3: Creating a JWT
+Requires a secret key.
+import { jwtGeneratorGenerateToken } from 'librgrn'
+const jwt = jwtGeneratorGenerateToken({
+key: 'your-secret-key',
+algorithm: 'HS256',
+expiresIn: 3600
+})
+
+Example 4: Creating a Secret Webhook
+import { webhookGeneratorGenerateSecret } from 'librgrn'
+const secret = webhookGeneratorGenerateSecret({ algorithm: 'sha256' })
+
+Example 5: Creating a PIN
+import { pinGeneratorGenerateTokens } from 'librgrn'
+const pinResult = pinGeneratorGenerateTokens({ length: 6, excludeSequential: true })
+
+CONFIGURATION AND OPTIONS
+Almost all generation functions accept an options object for customization.
+Length or BitLength: Sets the character or bit length of the generated data.
+Format: Options include hex, base64, base64url, alphanumeric, and uuid.
+IncludeEntropy: Includes bit entropy information in the results for security audits.
+IncludeTimestamp: Includes the generation time in the results.
+Presets: Use available presets like basic, standard, strong, and maximum for quick configuration without manually setting many options.
+Export: Generation results can be exported using a dedicated export function to JSON, TXT, CSV, or ENV formats.
+
+PROJECT STRUCTURE
+src/
+
+- error.ts: Definition of the main error class and its descendants.
+- lib.ts: The main entry point that exports all modules.
+- prelude.ts: The prelude file for quick export.
+- module/
+- security/
+- auth/ (contains password, pin, api_key, api_tok)en, passphrase)
+- token/ (contains bearer, jwt, oauth, webhook)
+- crypto/ (contains encryption_key, hash, salt, laravel_key, ssh_key, bcrypt)
+
+LICENSE
+This project is licensed under the GNU Affero General Public License Version 3 (AGPL-3.0).
+This is a free, copyleft software license that ensures the freedom to share and modify the work. This license is specifically designed to ensure community collaboration in the case of network server software.
+If you modify the program and run it on a publicly accessible server, you are required to provide the source code of the modified version to the server users.
+
+CONTRIBUTIONS
+Contributions are accepted via pull requests in the GitHub repository.
+Follow strict TypeScript code standards (avoid any unless justified).
+Prefer predictable functional logic.
+Ensure all tests pass by running npm test.
+Use Conventional Commits for commit messages (e.g., feat, fix, chore, docs).
+Please report security vulnerabilities privately via email or the provided security channels; do not create public issues for security flaws.
+
+CONTACT AND SUPPORT
+Official Repository: https://github.com/neuxdotdev/librgrn
+Issues Page: https://github.com/neuxdotdev/librgrn/issues
+Security Email: neuxdev1@gmail.com
+Additional Documentation: See the changelog for version history and the latest features.
+
+IMPORTANT NOTE
+Be sure to store generated secret keys, passwords, and tokens securely. Do not commit sensitive credentials to the public repository.
+Validation functions are available and recommended for checking the strength of credentials before deploying in a production environment.
+This library is under continuous development; please check the changelog for information on version changes, bug fixes, or new features.
+The minimum Node.js version is 24; ensure your runtime environment is compatible.
