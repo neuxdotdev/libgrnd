@@ -97,3 +97,6 @@
 * [78f0472] 2026-03-05 | neuxdotdev | docs: overhaul README with comprehensive library documentation
 * [cb38950] 2026-03-05 | neuxdotdev | chore(deps): setup testing & linting tools; overhaul Rollup build config
 * [7cacb5c] 2026-03-05 | neuxdotdev | Merge branch 'master' of https://github.com/neuxdotdev/libgrnd
+* [e113e5b] 2026-03-04 | CI Bot | Update changelog [2026-03-04 18:10:14]
+* [512d4e2] 2026-03-05 | neuxdotdev | release v1.1.0
+* [8f65dac] 2026-03-05 | neuxdotdev | chore: remove comments and make clean
