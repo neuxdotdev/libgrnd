@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from 'crypto'
 import { ValidationError } from '../../../error.js'
-export const API_KEY_SUPPORTED_FORMATS = [
+export const API_KEY_GENERATOR_SUPPORTED_FORMATS = [
 	'alphanumeric',
 	'hex',
 	'base64',
@@ -8,22 +8,22 @@ export const API_KEY_SUPPORTED_FORMATS = [
 	'uuid',
 	'numeric',
 ] as const
-export const API_KEY_ENTROPY_THRESHOLDS = [
+export const API_KEY_GENERATOR_ENTROPY_THRESHOLDS = [
 	{ min: 0, max: 64, label: 'WEAK' },
 	{ min: 65, max: 128, label: 'FAIR' },
 	{ min: 129, max: 192, label: 'GOOD' },
 	{ min: 193, max: 256, label: 'STRONG' },
 	{ min: 257, max: Infinity, label: 'VERY_STRONG' },
 ] as const
-const API_KEY_MIN_COUNT = 1
-const API_KEY_MAX_COUNT = 25
-const API_KEY_MIN_LENGTH = 8
-const API_KEY_MAX_LENGTH = 256
-const API_KEY_MAX_PREFIX_LENGTH = 20
-const API_KEY_PREFIX_REGEX = /^[a-zA-Z0-9_]+$/
-const API_KEY_BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
-const API_KEY_BASE32_LOOKUP = API_KEY_BASE32_ALPHABET.split('')
-export type ApiKeyFormat = (typeof API_KEY_SUPPORTED_FORMATS)[number]
+const API_KEY_GENERATOR_MIN_COUNT = 1
+const API_KEY_GENERATOR_MAX_COUNT = 25
+const API_KEY_GENERATOR_MIN_LENGTH = 8
+const API_KEY_GENERATOR_MAX_LENGTH = 256
+const API_KEY_GENERATOR_MAX_PREFIX_LENGTH = 20
+const API_KEY_GENERATOR_PREFIX_REGEX = /^[a-zA-Z0-9_]+$/
+const API_KEY_GENERATOR_BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+const API_KEY_GENERATOR_BASE32_LOOKUP = API_KEY_GENERATOR_BASE32_ALPHABET.split('')
+export type ApiKeyFormat = (typeof API_KEY_GENERATOR_SUPPORTED_FORMATS)[number]
 export interface ApiKeyGenerateOptions {
 	count?: number
 	length?: number
@@ -54,7 +54,7 @@ interface ApiKeyValidationRule {
 	validate: (value: any) => void
 	required?: boolean
 }
-function apiKeyBase32Encode(buffer: Buffer): string {
+function apiKeyGeneratorBase32Encode(buffer: Buffer): string {
 	let bits = 0
 	let value = 0
 	let output = ''
@@ -64,17 +64,17 @@ function apiKeyBase32Encode(buffer: Buffer): string {
 		bits += 8
 		while (bits >= 5) {
 			const index = (value >>> (bits - 5)) & 31
-			output += API_KEY_BASE32_LOOKUP[index]
+			output += API_KEY_GENERATOR_BASE32_LOOKUP[index]
 			bits -= 5
 		}
 	}
 	if (bits > 0) {
 		const index = (value << (5 - bits)) & 31
-		output += API_KEY_BASE32_LOOKUP[index]
+		output += API_KEY_GENERATOR_BASE32_LOOKUP[index]
 	}
 	return output
 }
-function apiKeyGenerateNumericString(length: number): string {
+function apiKeyGeneratorGenerateNumericString(length: number): string {
 	const bytes = randomBytes(Math.ceil(length * 0.5))
 	let result = ''
 	let byteIndex = 0
@@ -92,20 +92,22 @@ function apiKeyGenerateNumericString(length: number): string {
 	}
 	return result.slice(0, length)
 }
-function apiKeyGetEntropyStrength(byteLength: number): string {
+function apiKeyGeneratorGetEntropyStrength(byteLength: number): string {
 	const bits = byteLength * 8
-	const threshold = API_KEY_ENTROPY_THRESHOLDS.find((t) => bits >= t.min && bits <= t.max)
+	const threshold = API_KEY_GENERATOR_ENTROPY_THRESHOLDS.find(
+		(t) => bits >= t.min && bits <= t.max,
+	)
 	return threshold?.label ?? 'UNKNOWN'
 }
-const apiKeyGenerators: Record<ApiKeyFormat, (length: number) => string> = {
-	alphanumeric: (len) => apiKeyBase32Encode(randomBytes(len)),
+const apiKeyGeneratorGenerators: Record<ApiKeyFormat, (length: number) => string> = {
+	alphanumeric: (len) => apiKeyGeneratorBase32Encode(randomBytes(len)),
 	hex: (len) => randomBytes(len).toString('hex'),
 	base64: (len) => randomBytes(len).toString('base64').replace(/=+$/, ''),
 	base64url: (len) => randomBytes(len).toString('base64url'),
 	uuid: () => randomUUID(),
-	numeric: (len) => apiKeyGenerateNumericString(len),
+	numeric: (len) => apiKeyGeneratorGenerateNumericString(len),
 }
-function apiKeyCreateValidator<T extends ApiKeyGenerateOptions>(rules: {
+function apiKeyGeneratorCreateValidator<T extends ApiKeyGenerateOptions>(rules: {
 	[K in keyof T]?: ApiKeyValidationRule
 }) {
 	return (
@@ -125,7 +127,7 @@ function apiKeyCreateValidator<T extends ApiKeyGenerateOptions>(rules: {
 					: (() => {
 							switch (key) {
 								case 'count':
-									return API_KEY_MIN_COUNT
+									return API_KEY_GENERATOR_MIN_COUNT
 								case 'length':
 									return 32
 								case 'format':
@@ -147,21 +149,21 @@ function apiKeyCreateValidator<T extends ApiKeyGenerateOptions>(rules: {
 			if (options.secretLength !== undefined) {
 				if (
 					!Number.isInteger(options.secretLength) ||
-					options.secretLength < API_KEY_MIN_LENGTH ||
-					options.secretLength > API_KEY_MAX_LENGTH
+					options.secretLength < API_KEY_GENERATOR_MIN_LENGTH ||
+					options.secretLength > API_KEY_GENERATOR_MAX_LENGTH
 				) {
 					throw new ValidationError(
-						`secretLength must be an integer between ${API_KEY_MIN_LENGTH} and ${API_KEY_MAX_LENGTH}`,
+						`secretLength must be an integer between ${API_KEY_GENERATOR_MIN_LENGTH} and ${API_KEY_GENERATOR_MAX_LENGTH}`,
 						{ secretLength: options.secretLength },
 					)
 				}
 			}
 			if (
 				options.secretFormat !== undefined &&
-				!API_KEY_SUPPORTED_FORMATS.includes(options.secretFormat)
+				!API_KEY_GENERATOR_SUPPORTED_FORMATS.includes(options.secretFormat)
 			) {
 				throw new ValidationError(
-					`secretFormat must be one of: ${API_KEY_SUPPORTED_FORMATS.join(', ')}`,
+					`secretFormat must be one of: ${API_KEY_GENERATOR_SUPPORTED_FORMATS.join(', ')}`,
 					{ secretFormat: options.secretFormat },
 				)
 			}
@@ -169,12 +171,16 @@ function apiKeyCreateValidator<T extends ApiKeyGenerateOptions>(rules: {
 		return result
 	}
 }
-const apiKeyValidateOptions = apiKeyCreateValidator<ApiKeyGenerateOptions>({
+const apiKeyGeneratorValidateOptions = apiKeyGeneratorCreateValidator<ApiKeyGenerateOptions>({
 	count: {
 		validate: (val) => {
-			if (!Number.isInteger(val) || val < API_KEY_MIN_COUNT || val > API_KEY_MAX_COUNT) {
+			if (
+				!Number.isInteger(val) ||
+				val < API_KEY_GENERATOR_MIN_COUNT ||
+				val > API_KEY_GENERATOR_MAX_COUNT
+			) {
 				throw new ValidationError(
-					`count must be an integer between ${API_KEY_MIN_COUNT} and ${API_KEY_MAX_COUNT}`,
+					`count must be an integer between ${API_KEY_GENERATOR_MIN_COUNT} and ${API_KEY_GENERATOR_MAX_COUNT}`,
 					{ count: val },
 				)
 			}
@@ -182,9 +188,13 @@ const apiKeyValidateOptions = apiKeyCreateValidator<ApiKeyGenerateOptions>({
 	},
 	length: {
 		validate: (val) => {
-			if (!Number.isInteger(val) || val < API_KEY_MIN_LENGTH || val > API_KEY_MAX_LENGTH) {
+			if (
+				!Number.isInteger(val) ||
+				val < API_KEY_GENERATOR_MIN_LENGTH ||
+				val > API_KEY_GENERATOR_MAX_LENGTH
+			) {
 				throw new ValidationError(
-					`length must be an integer between ${API_KEY_MIN_LENGTH} and ${API_KEY_MAX_LENGTH}`,
+					`length must be an integer between ${API_KEY_GENERATOR_MIN_LENGTH} and ${API_KEY_GENERATOR_MAX_LENGTH}`,
 					{ length: val },
 				)
 			}
@@ -192,9 +202,9 @@ const apiKeyValidateOptions = apiKeyCreateValidator<ApiKeyGenerateOptions>({
 	},
 	format: {
 		validate: (val) => {
-			if (!API_KEY_SUPPORTED_FORMATS.includes(val)) {
+			if (!API_KEY_GENERATOR_SUPPORTED_FORMATS.includes(val)) {
 				throw new ValidationError(
-					`format must be one of: ${API_KEY_SUPPORTED_FORMATS.join(', ')}`,
+					`format must be one of: ${API_KEY_GENERATOR_SUPPORTED_FORMATS.join(', ')}`,
 					{ format: val },
 				)
 			}
@@ -206,13 +216,13 @@ const apiKeyValidateOptions = apiKeyCreateValidator<ApiKeyGenerateOptions>({
 				if (typeof val !== 'string') {
 					throw new ValidationError('prefix must be a string', { prefix: val })
 				}
-				if (val.length > API_KEY_MAX_PREFIX_LENGTH) {
+				if (val.length > API_KEY_GENERATOR_MAX_PREFIX_LENGTH) {
 					throw new ValidationError(
-						`prefix length must not exceed ${API_KEY_MAX_PREFIX_LENGTH} characters`,
+						`prefix length must not exceed ${API_KEY_GENERATOR_MAX_PREFIX_LENGTH} characters`,
 						{ prefixLength: val.length },
 					)
 				}
-				if (!API_KEY_PREFIX_REGEX.test(val)) {
+				if (!API_KEY_GENERATOR_PREFIX_REGEX.test(val)) {
 					throw new ValidationError(
 						'prefix may only contain alphanumeric characters and underscores',
 						{ prefix: val },
@@ -231,7 +241,7 @@ const apiKeyValidateOptions = apiKeyCreateValidator<ApiKeyGenerateOptions>({
 		},
 	},
 })
-function* apiKeyGenerateKeyItems(
+function* apiKeyGeneratorGenerateKeyItems(
 	count: number,
 	length: number,
 	format: ApiKeyFormat,
@@ -241,29 +251,31 @@ function* apiKeyGenerateKeyItems(
 	secretFormat: ApiKeyFormat,
 ): Generator<ApiKeyItem, void, unknown> {
 	for (let i = 0; i < count; i++) {
-		const generator = apiKeyGenerators[format]
+		const generator = apiKeyGeneratorGenerators[format]
 		const keyRaw = generator(length)
 		const key = prefix ? `${prefix}_${keyRaw}` : keyRaw
 		const item: ApiKeyItem = { key }
 		if (includeSecret) {
-			const secretGenerator = apiKeyGenerators[secretFormat]
+			const secretGenerator = apiKeyGeneratorGenerators[secretFormat]
 			const secretRaw = secretGenerator(secretLength)
 			item.secret = prefix ? `${prefix}_${secretRaw}` : secretRaw
 		}
 		yield item
 	}
 }
-function apiKeyCollectGenerator<T>(gen: Generator<T>): T[] {
+function apiKeyGeneratorCollectGenerator<T>(gen: Generator<T>): T[] {
 	const result: T[] = []
 	for (const item of gen) {
 		result.push(item)
 	}
 	return result
 }
-export function apiKeyGenerateTokens(options: ApiKeyGenerateOptions = {}): ApiKeyGenerateResult {
+export function apiKeyGeneratorGenerateTokens(
+	options: ApiKeyGenerateOptions = {},
+): ApiKeyGenerateResult {
 	const { count, length, format, prefix, includeSecret, secretLength, secretFormat } =
-		apiKeyValidateOptions(options)
-	const gen = apiKeyGenerateKeyItems(
+		apiKeyGeneratorValidateOptions(options)
+	const gen = apiKeyGeneratorGenerateKeyItems(
 		count,
 		length,
 		format,
@@ -272,8 +284,8 @@ export function apiKeyGenerateTokens(options: ApiKeyGenerateOptions = {}): ApiKe
 		secretLength,
 		secretFormat,
 	)
-	const keys = apiKeyCollectGenerator(gen)
-	const entropyStrength = keys.length > 0 ? apiKeyGetEntropyStrength(length) : undefined
+	const keys = apiKeyGeneratorCollectGenerator(gen)
+	const entropyStrength = keys.length > 0 ? apiKeyGeneratorGetEntropyStrength(length) : undefined
 	const metadata: ApiKeyGenerateResult['metadata'] = {
 		count,
 		length,
@@ -285,7 +297,7 @@ export function apiKeyGenerateTokens(options: ApiKeyGenerateOptions = {}): ApiKe
 	}
 	return { keys, metadata }
 }
-export function apiKeyExportTokens(
+export function apiKeyGeneratorExportTokens(
 	result: ApiKeyGenerateResult,
 	exportFormat: 'json' | 'txt' | 'csv' = 'json',
 ): string {
@@ -323,8 +335,8 @@ export function apiKeyExportTokens(
 			throw new ValidationError(`Unsupported export format: ${exportFormat}`)
 	}
 }
-export function apiKeyGenerateSample(): ApiKeyItem {
-	const result = apiKeyGenerateTokens({
+export function apiKeyGeneratorGenerateSample(): ApiKeyItem {
+	const result = apiKeyGeneratorGenerateTokens({
 		count: 1,
 		length: 32,
 		format: 'alphanumeric',
@@ -333,14 +345,14 @@ export function apiKeyGenerateSample(): ApiKeyItem {
 	return result.keys[0]!
 }
 export class ApiKeyGenerator {
-	private options: ReturnType<typeof apiKeyValidateOptions>
+	private options: ReturnType<typeof apiKeyGeneratorValidateOptions>
 	constructor(options: ApiKeyGenerateOptions = {}) {
-		this.options = apiKeyValidateOptions(options)
+		this.options = apiKeyGeneratorValidateOptions(options)
 	}
-	public apiKeyGenerateInstance(): ApiKeyGenerateResult {
+	public apiKeyGeneratorGenerateInstance(): ApiKeyGenerateResult {
 		const { count, length, format, prefix, includeSecret, secretLength, secretFormat } =
 			this.options
-		const gen = apiKeyGenerateKeyItems(
+		const gen = apiKeyGeneratorGenerateKeyItems(
 			count,
 			length,
 			format,
@@ -349,8 +361,9 @@ export class ApiKeyGenerator {
 			secretLength,
 			secretFormat,
 		)
-		const keys = apiKeyCollectGenerator(gen)
-		const entropyStrength = keys.length > 0 ? apiKeyGetEntropyStrength(length) : undefined
+		const keys = apiKeyGeneratorCollectGenerator(gen)
+		const entropyStrength =
+			keys.length > 0 ? apiKeyGeneratorGetEntropyStrength(length) : undefined
 		const metadata: ApiKeyGenerateResult['metadata'] = {
 			count,
 			length,
@@ -362,10 +375,10 @@ export class ApiKeyGenerator {
 		}
 		return { keys, metadata }
 	}
-	public apiKeyExportInstance(
+	public apiKeyGeneratorExportInstance(
 		result: ApiKeyGenerateResult,
 		exportFormat: 'json' | 'txt' | 'csv' = 'json',
 	): string {
-		return apiKeyExportTokens(result, exportFormat)
+		return apiKeyGeneratorExportTokens(result, exportFormat)
 	}
 }
