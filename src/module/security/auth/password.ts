@@ -11,7 +11,6 @@ export const PASSWORD_GENERATOR_UPPERCASE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 export const PASSWORD_GENERATOR_LOWERCASE_CHARS = 'abcdefghijklmnopqrstuvwxyz'
 export const PASSWORD_GENERATOR_NUMBER_CHARS = '0123456789'
 export const PASSWORD_GENERATOR_SYMBOL_CHARS = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-export const PASSWORD_GENERATOR_SIMILAR_CHARS = '0O1lI2Z5S8B'
 export const PASSWORD_GENERATOR_AMBIGUOUS_CHARS = '0O1lI'
 export const PASSWORD_GENERATOR_ENTROPY_THRESHOLDS = Object.freeze([
 	{ min: 0, max: 39, label: 'weak' as const },
@@ -243,11 +242,6 @@ function passwordBuildCharacterPool(
 	if (options.useNumbers) pool += PASSWORD_GENERATOR_NUMBER_CHARS
 	if (options.useSymbols) pool += PASSWORD_GENERATOR_SYMBOL_CHARS
 	const excludeSet = new Set(options.excludeChars)
-	if (options.excludeSimilar) {
-		for (const ch of PASSWORD_GENERATOR_SIMILAR_CHARS) {
-			excludeSet.add(ch)
-		}
-	}
 	if (options.excludeWhitespace) {
 		for (const ch of ' \t\n\r') {
 			excludeSet.add(ch)
