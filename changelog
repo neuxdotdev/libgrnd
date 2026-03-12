@@ -104,6 +104,7 @@
 * [aee246f] 2026-03-07 | neuxdotdev | feat(security): overhaul API key generator with advanced security features
 * [0cae83b] 2026-03-08 | neuxdotdev | pre release
 * [0d7db47] 2026-03-08 | CI Bot | Update changelog [2026-03-08 14:01:58]
+* [12e9bea] 2026-03-09 | dependabot[bot] | chore(deps): bump actions/upload-artifact from 4 to 7
 * [69969e0] 2026-03-09 | dependabot[bot] | chore(deps): bump actions/checkout from 4 to 6
 * [ed20190] 2026-03-09 | dependabot[bot] | chore(deps): bump actions/cache from 4 to 5
 * [c4682a1] 2026-03-09 | dependabot[bot] | chore(deps): bump actions/setup-node from 4 to 6
@@ -112,3 +113,5 @@
 * [bbf1d8f] 2026-03-12 | neuxdotdev | chore(deps): bump actions/cache from 4 to 5 (#5)
 * [762bac6] 2026-03-12 | CI Bot | Update changelog [2026-03-12 07:43:05]
 * [559c3a6] 2026-03-12 | neuxdotdev | chore(deps): bump actions/checkout from 4 to 6 (#4)
+* [5269c27] 2026-03-12 | CI Bot | Update changelog [2026-03-12 07:43:17]
+* [7664f62] 2026-03-12 | neuxdotdev | chore(deps): bump actions/upload-artifact from 4 to 7 (#3)
